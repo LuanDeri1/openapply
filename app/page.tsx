@@ -1,122 +1,199 @@
 import Link from "next/link";
 
-type FeatureCardProps = {
-  title: string;
-  description: string;
-  href: string;
-};
+type Stat = { value: string; label: string };
+type Card = { title: string; description: string; href: string; tag?: string };
 
-const FeatureCard = ({ title, description, href }: FeatureCardProps) => (
-  <Link
-    href={href}
-    className="group rounded-2xl border border-black/10 p-6 transition hover:border-black"
-  >
-    <h3 className="text-lg font-semibold group-hover:text-black">{title}</h3>
-    <p className="mt-3 text-sm text-black/70">{description}</p>
-    <span className="mt-6 inline-flex text-sm font-medium text-black/70 group-hover:text-black">
-      Explore →
-    </span>
-  </Link>
-);
+const stats: Stat[] = [
+  { value: "50+", label: "Focused guides for admissions + financial aid" },
+  { value: "24", label: "New resources curated every month" },
+  { value: "120", label: "Countries represented by our community" },
+];
 
-const FocusMetric = ({ label, value }: { label: string; value: string }) => (
-  <div className="rounded-2xl border border-black/10 p-6">
-    <p className="text-2xl font-semibold">{value}</p>
-    <p className="mt-2 text-sm text-black/70">{label}</p>
-  </div>
-);
+const startCards: Card[] = [
+  {
+    title: "Admissions roadmap",
+    description:
+      "Understand timelines, academic requirements, and how to stand out.",
+    href: "/guides",
+    tag: "Guides",
+  },
+  {
+    title: "Scholarship strategy",
+    description:
+      "Find funding sources and craft strong scholarship submissions.",
+    href: "/resources",
+    tag: "Resources",
+  },
+  {
+    title: "CSS Profile help",
+    description:
+      "Step-by-step help for the financial aid forms many schools require.",
+    href: "/guides",
+    tag: "Guides",
+  },
+];
 
-export default function HomePage() {
+const latestGuides: Card[] = [
+  {
+    title: "Application timeline checklist",
+    description: "A month-by-month plan from research to decision letters.",
+    href: "/guides",
+  },
+  {
+    title: "Common essay mistakes (and fixes)",
+    description: "What admissions readers flag — and how to improve fast.",
+    href: "/guides",
+  },
+  {
+    title: "Letters of recommendation playbook",
+    description: "Who to ask, when to ask, and how to make it easy for them.",
+    href: "/guides",
+  },
+];
+
+export default function Page() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-6 py-16">
-      <section className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr]">
+    <main className="mx-auto max-w-6xl px-6 py-14">
+      {/* Hero */}
+      <section className="grid gap-10 md:grid-cols-2 md:items-start">
         <div className="space-y-6">
-          <span className="inline-flex items-center rounded-full border border-black/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-black/60">
-            Global access, free forever
-          </span>
-          <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">
-            Everything international students need to apply to U.S. universities and
-            scholarships.
+          <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs tracking-wide text-neutral-600">
+            GLOBAL ACCESS, FREE FOREVER
+          </div>
+
+          <h1 className="text-balance text-4xl font-semibold tracking-tight md:text-5xl">
+            Everything international students need to apply to U.S.
+            universities and scholarships.
           </h1>
-          <p className="text-lg text-black/70">
-            OpenApply is a modern, collaborative platform built to remove paywalls and
-            confusion. Get clear admissions guidance, scholarship strategies, and a
-            growing community that supports every step.
+
+          <p className="max-w-prose text-pretty text-neutral-600">
+            OpenApply is a modern, collaborative platform to remove paywalls and
+            confusion. Get clear admissions guidance, scholarship strategies,
+            and a growing community that supports every step.
           </p>
-          <div className="flex flex-wrap gap-4">
+
+          <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/guides"
-              className="rounded-full bg-black px-6 py-3 text-sm font-semibold text-white"
+              className="inline-flex items-center justify-center rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
             >
               Explore guides
             </Link>
             <Link
               href="/resources"
-              className="rounded-full border border-black/20 px-6 py-3 text-sm font-semibold text-black/70 hover:border-black hover:text-black"
+              className="inline-flex items-center justify-center rounded-full border px-5 py-2.5 text-sm font-medium hover:bg-neutral-50"
             >
               Browse resources
             </Link>
           </div>
         </div>
-        <div className="space-y-4">
-          <FocusMetric label="Focused guides for admissions + financial aid" value="50+" />
-          <FocusMetric label="New resources curated every month" value="24" />
-          <FocusMetric label="Countries represented by our community" value="120" />
+
+        {/* Stats */}
+        <div className="grid gap-4">
+          {stats.map((s) => (
+            <div
+              key={s.label}
+              className="rounded-2xl border bg-white p-6 shadow-sm"
+            >
+              <div className="text-3xl font-semibold">{s.value}</div>
+              <div className="mt-1 text-sm text-neutral-600">{s.label}</div>
+            </div>
+          ))}
         </div>
       </section>
 
-      <section className="mt-20">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      {/* Start with what matters most */}
+      <section className="mt-14">
+        <h2 className="text-xl font-semibold">Start with what matters most</h2>
+        <p className="mt-2 max-w-prose text-sm text-neutral-600">
+          Learn the foundations, then dive into details across admissions,
+          scholarships, and required documents.
+        </p>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {startCards.map((c) => (
+            <Link
+              key={c.title}
+              href={c.href}
+              className="group rounded-2xl border bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="text-base font-semibold">{c.title}</div>
+                {c.tag ? (
+                  <div className="rounded-full border px-2 py-0.5 text-xs text-neutral-600">
+                    {c.tag}
+                  </div>
+                ) : null}
+              </div>
+              <p className="mt-2 text-sm text-neutral-600">{c.description}</p>
+              <div className="mt-4 text-sm font-medium">
+                Explore{" "}
+                <span className="transition group-hover:translate-x-0.5 inline-block">
+                  →
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Latest guides */}
+      <section className="mt-14">
+        <div className="flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold">Start with what matters most</h2>
-            <p className="mt-2 text-black/70">
-              Learn the foundations, then dive into details across admissions,
-              scholarships, and required documents.
+            <h2 className="text-xl font-semibold">Latest guides</h2>
+            <p className="mt-2 text-sm text-neutral-600">
+              Fresh, practical steps you can follow this week.
             </p>
           </div>
+
           <Link
             href="/guides"
-            className="text-sm font-semibold text-black/70 hover:text-black"
+            className="text-sm font-medium text-neutral-900 hover:underline"
           >
-            View all guides →
+            View all →
           </Link>
         </div>
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
-          <FeatureCard
-            title="Admissions roadmap"
-            description="Understand timelines, academic requirements, and how to stand out."
-            href="/guides/admissions"
-          />
-          <FeatureCard
-            title="Scholarship strategy"
-            description="Find funding sources and craft strong scholarship submissions."
-            href="/guides/scholarships"
-          />
-          <FeatureCard
-            title="CSS Profile help"
-            description="Step-by-step help for the CSS Profile and financial aid forms."
-            href="/guides/css-profile"
-          />
+
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {latestGuides.map((g) => (
+            <Link
+              key={g.title}
+              href={g.href}
+              className="group rounded-2xl border bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className="text-base font-semibold">{g.title}</div>
+              <p className="mt-2 text-sm text-neutral-600">{g.description}</p>
+              <div className="mt-4 text-sm font-medium">
+                Read{" "}
+                <span className="transition group-hover:translate-x-0.5 inline-block">
+                  →
+                </span>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
-      <section className="mt-20 rounded-3xl border border-black/10 p-10">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      {/* CTA */}
+      <section className="mt-14 rounded-2xl border bg-white p-8 shadow-sm">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold">Community stories are coming</h2>
-            <p className="mt-2 text-black/70">
-              We will open community posting soon. For now, explore public advice and
-              sign in to be ready to contribute your experience.
+            <h3 className="text-lg font-semibold">Community stories are coming</h3>
+            <p className="mt-1 text-sm text-neutral-600">
+              For now, explore public advice and sign in to be ready to contribute
+              your experience.
             </p>
           </div>
+
           <Link
             href="/community"
-            className="rounded-full border border-black/20 px-6 py-3 text-sm font-semibold text-black/70 hover:border-black hover:text-black"
+            className="inline-flex items-center justify-center rounded-full border px-5 py-2.5 text-sm font-medium hover:bg-neutral-50"
           >
             Sign in to post
           </Link>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
