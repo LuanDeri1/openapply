@@ -2,140 +2,42 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { guides, type Guide, type GuideCategory, formatUpdated } from "@/app/lib/guides";
 
-type GuideCategory =
-  | "Admissions"
-  | "Scholarships"
-  | "Essays"
-  | "Interviews"
-  | "Visa"
-  | "Finance";
+const ALL = "All" as const;
+type Filter = typeof ALL | GuideCategory;
 
-type Guide = {
-  slug: string;
-  title: string;
-  description: string;
-  category: GuideCategory;
-  tags: string[];
-  minutes: number;
-  updated: string; // YYYY-MM-DD
-  featured?: boolean;
-};
-
-const GUIDES: Guide[] = [
-  {
-    slug: "scholarship-strategy-that-works",
-    title: "Scholarship strategy that actually works",
-    description:
-      "How to find scholarships, prioritize by ROI, and build a repeatable application system.",
-    category: "Scholarships",
-    tags: ["funding", "search", "system"],
-    minutes: 10,
-    updated: "2025-12-23",
-    featured: true,
-  },
-  {
-    slug: "admissions-roadmap-a-to-z",
-    title: "Admissions roadmap (A–Z)",
-    description:
-      "A step-by-step plan from research → shortlist → essays → recommendations → submission.",
-    category: "Admissions",
-    tags: ["timeline", "checklist", "planning"],
-    minutes: 12,
-    updated: "2025-12-23",
-    featured: true,
-  },
-  {
-    slug: "common-app-essay-playbook",
-    title: "Common App essay playbook",
-    description:
-      "Brainstorming, structure, and revision workflow — with examples of strong narrative arcs.",
-    category: "Essays",
-    tags: ["writing", "story", "revision"],
-    minutes: 15,
-    updated: "2025-12-22",
-  },
-  {
-    slug: "interview-prep-scripts",
-    title: "Interview prep (with scripts)",
-    description:
-      "How to answer “Tell me about yourself”, “Why this school”, and tough follow-ups calmly.",
-    category: "Interviews",
-    tags: ["practice", "scripts", "confidence"],
-    minutes: 8,
-    updated: "2025-12-21",
-  },
-  {
-    slug: "visa-arrival-checklist",
-    title: "Visa + arrival checklist",
-    description:
-      "Docs to prepare, common pitfalls, and first-week setup (SIM, bank, ID, campus basics).",
-    category: "Visa",
-    tags: ["F-1", "arrival", "documents"],
-    minutes: 9,
-    updated: "2025-12-20",
-  },
-  {
-    slug: "budgeting-us-international",
-    title: "Budgeting in the U.S. as an international student",
-    description:
-      "Realistic monthly budgets, rent strategies, and how to avoid money stress during school.",
-    category: "Finance",
-    tags: ["budget", "rent", "planning"],
-    minutes: 11,
-    updated: "2025-12-19",
-  },
-];
-
-const CATEGORY_ORDER: (GuideCategory | "All")[] = [
-  "All",
-  "Admissions",
-  "Scholarships",
-  "Essays",
-  "Interviews",
-  "Visa",
-  "Finance",
-];
-
-function formatUpdated(dateStr: string) {
-  // Safe-ish formatting without importing date libs
-  // dateStr is "YYYY-MM-DD"
-  return dateStr;
+function cx(...classes: Array<string | false | undefined | null>) {
+  return classes.filter(Boolean).join(" ");
 }
 
-function includesCI(haystack: string, needle: string) {
-  return haystack.toLowerCase().includes(needle.toLowerCase());
-}
-
-function GuideCard({ guide }: { guide: Guide }) {
+function GuideCard({ g }: { g: Guide }) {
   return (
     <Link
-      href={`/guides/${guide.slug}`}
-      className="group block rounded-2xl border border-black/10 bg-white p-6 shadow-sm transition hover:shadow-md"
+      href={`/guides/${g.slug}`}
+      className="block rounded-2xl border border-black/15 bg-white p-6 transition hover:border-black/30"
     >
-      <div className="mb-2 text-xs font-medium tracking-wide text-black/50">
-        {guide.category}
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <span className="text-xs font-semibold uppercase tracking-wide text-black/60">
+          {g.category}
+        </span>
+        <span className="text-xs text-black/50">
+          ~{g.minutes} min · Updated {formatUpdated(g.updatedISO)}
+        </span>
       </div>
 
-      <div className="text-lg font-semibold text-black group-hover:underline">
-        {guide.title}
-      </div>
-
-      <p className="mt-2 text-sm leading-6 text-black/60">{guide.description}</p>
+      <h3 className="text-lg font-semibold text-black">{g.title}</h3>
+      <p className="mt-2 text-sm text-black/60">{g.description}</p>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {guide.tags.map((t) => (
+        {g.tags.slice(0, 3).map((t) => (
           <span
             key={t}
-            className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs text-black/70"
+            className="rounded-full border border-black/15 px-3 py-1 text-xs text-black/70"
           >
             {t}
           </span>
         ))}
-      </div>
-
-      <div className="mt-4 text-xs text-black/50">
-        ~{guide.minutes} min • Updated {formatUpdated(guide.updated)}
       </div>
     </Link>
   );
@@ -143,117 +45,107 @@ function GuideCard({ guide }: { guide: Guide }) {
 
 export default function GuidesPage() {
   const [query, setQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState<GuideCategory | "All">(
-    "All"
-  );
+  const [filter, setFilter] = useState<Filter>(ALL);
+
+  const categories = useMemo<Filter[]>(() => {
+    const set = new Set<GuideCategory>();
+    for (const g of guides) set.add(g.category);
+    return [ALL, ...Array.from(set)];
+  }, []);
 
   const filtered = useMemo(() => {
-    const q = query.trim();
-    return GUIDES.filter((g) => {
-      const matchesCategory =
-        activeCategory === "All" ? true : g.category === activeCategory;
+    const q = query.trim().toLowerCase();
 
-      const matchesQuery =
-        q.length === 0
-          ? true
-          : includesCI(g.title, q) ||
-            includesCI(g.description, q) ||
-            includesCI(g.category, q) ||
-            g.tags.some((t) => includesCI(t, q));
+    return guides.filter((g) => {
+      const matchesCategory = filter === ALL ? true : g.category === filter;
+
+      const haystack = (
+        g.title +
+        " " +
+        g.description +
+        " " +
+        g.category +
+        " " +
+        g.tags.join(" ")
+      ).toLowerCase();
+
+      const matchesQuery = q.length === 0 ? true : haystack.includes(q);
 
       return matchesCategory && matchesQuery;
     });
-  }, [query, activeCategory]);
+  }, [query, filter]);
 
-  const featured = useMemo(
-    () => filtered.filter((g) => g.featured),
-    [filtered]
-  );
-
-  // ✅ Fix: don’t duplicate featured in “All guides”
-  const nonFeatured = useMemo(
-    () => filtered.filter((g) => !g.featured),
-    [filtered]
-  );
+  const featured = filtered.slice(0, 2);
+  const rest = filtered.slice(2);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-6 py-14">
+    <main className="mx-auto w-full max-w-6xl px-6 pb-16 pt-10">
       <div className="mb-3">
-        <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs font-medium text-black/60">
-          GUIDES <span className="text-black/30">categories + search</span>
-        </div>
+        <span className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-4 py-1 text-xs font-semibold text-black/70">
+          GUIDES <span className="font-normal text-black/40">categories + search</span>
+        </span>
       </div>
 
       <h1 className="text-4xl font-semibold tracking-tight text-black">
         Guides for admissions, scholarships, and life in the U.S.
       </h1>
-
-      <p className="mt-3 max-w-2xl text-sm leading-6 text-black/60">
+      <p className="mt-3 text-sm text-black/60">
         Search by keyword, filter by category, and build your plan step-by-step.
       </p>
 
-      {/* Search + categories */}
-      <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="w-full md:flex-1">
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search guides (e.g., essays, visa, checklist, funding)..."
-            className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm text-black outline-none ring-0 placeholder:text-black/40 focus:border-black/20"
-          />
-        </div>
+      <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search guides (e.g., essays, visa, checklist, funding)..."
+          className="w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-sm outline-none focus:border-black/30"
+        />
 
         <div className="flex flex-wrap gap-2">
-          {CATEGORY_ORDER.map((cat) => {
-            const isActive = activeCategory === cat;
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setActiveCategory(cat as any)}
-                className={[
-                  "rounded-full border px-4 py-2 text-sm transition",
-                  isActive
-                    ? "border-black/20 bg-black text-white"
-                    : "border-black/10 bg-white text-black/70 hover:bg-black/[0.03]",
-                ].join(" ")}
-              >
-                {cat}
-              </button>
-            );
-          })}
+          {categories.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setFilter(c)}
+              className={cx(
+                "rounded-full border px-4 py-2 text-sm transition",
+                c === filter
+                  ? "border-black bg-black text-white"
+                  : "border-black/15 bg-white text-black/70 hover:border-black/30"
+              )}
+            >
+              {c}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="mt-3 text-xs text-black/50">
-        Showing {filtered.length} guide{filtered.length === 1 ? "" : "s"}.
-      </div>
+      <div className="mt-3 text-xs text-black/50">Showing {filtered.length} guides.</div>
 
-      {/* Featured */}
-      {featured.length > 0 && (
-        <section className="mt-10">
-          <div className="mb-4 text-sm font-semibold text-black">Featured</div>
-          <div className="grid gap-6 md:grid-cols-2">
-            {featured.map((g) => (
-              <GuideCard key={g.slug} guide={g} />
-            ))}
-          </div>
-        </section>
-      )}
+      <section className="mt-8">
+        <h2 className="mb-3 text-sm font-semibold text-black/70">Featured</h2>
+        <div className="grid gap-6 md:grid-cols-2">
+          {featured.map((g) => (
+            <GuideCard key={g.slug} g={g} />
+          ))}
+        </div>
+      </section>
 
-      {/* All guides */}
       <section className="mt-10">
-        <div className="mb-4 text-sm font-semibold text-black">All guides</div>
+        <h2 className="mb-3 text-sm font-semibold text-black/70">All guides</h2>
 
-        {nonFeatured.length === 0 ? (
-          <div className="rounded-2xl border border-black/10 bg-white p-8 text-sm text-black/60">
+        {filtered.length === 0 ? (
+          <div className="rounded-2xl border border-black/15 bg-white p-6 text-sm text-black/60">
             No guides match your search. Try a different keyword or category.
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-3">
-            {nonFeatured.map((g) => (
-              <GuideCard key={g.slug} guide={g} />
-            ))}
+            {rest.length ? (
+              rest.map((g) => <GuideCard key={g.slug} g={g} />)
+            ) : (
+              // if filtered <= 2, show them here too so the page isn't empty
+              filtered.map((g) => <GuideCard key={g.slug} g={g} />)
+            )}
           </div>
         )}
       </section>
