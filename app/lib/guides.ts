@@ -16,7 +16,7 @@ export type Guide = {
   tags: string[];
   minutes: number; // reading time
   updatedISO: string; // YYYY-MM-DD
-  content: string; // markdown-ish text for now
+  content: string; // markdown-ish text
 };
 
 export const guides: Guide[] = [
@@ -29,22 +29,21 @@ export const guides: Guide[] = [
     tags: ["funding", "search", "system"],
     minutes: 10,
     updatedISO: "2025-12-23",
-    content: `# Scholarship strategy that actually works
+    content: `
+## Build a shortlist
+- Start with big databases + your school’s list
+- Filter by eligibility + deadlines
 
-## 1) Build a shortlist
-- Start with big databases + your school's list
-- Filter for eligibility + deadlines
-
-## 2) Build a weekly pipeline
+## Build a weekly pipeline
 - Mon: find 5
 - Tue: outline 2
 - Wed: draft 1
 - Thu: polish 1
 - Fri: submit + track
 
-## 3) Track everything
-- name, deadline, requirements, status, notes
-`,
+## Track everything
+- Name, deadline, requirements, status, notes
+`.trim(),
   },
   {
     slug: "admissions-roadmap",
@@ -55,19 +54,18 @@ export const guides: Guide[] = [
     tags: ["timeline", "checklist", "planning"],
     minutes: 12,
     updatedISO: "2025-12-23",
-    content: `# Admissions roadmap (A–Z)
-
+    content: `
 ## Phase 1 — Research
-- Pick countries/program types
-- Create 10–20 school shortlist
+- Pick countries + program types
+- Build a 10–20 school shortlist
 
 ## Phase 2 — Requirements
-- tests, transcripts, translations
-- recommendations + deadlines
+- Tests, transcripts, translations
+- Recommendations + deadlines
 
 ## Phase 3 — Essays
-- draft → feedback → final
-`,
+- Draft → feedback → final
+`.trim(),
   },
   {
     slug: "common-app-essay-playbook",
@@ -78,15 +76,14 @@ export const guides: Guide[] = [
     tags: ["writing", "story", "revision"],
     minutes: 15,
     updatedISO: "2025-12-22",
-    content: `# Common App essay playbook
-
+    content: `
 ## Brainstorm
 - 10 moments that changed how you think
-- 5 moments you failed + what you learned
+- 5 failures + what you learned
 
 ## Structure
-- hook → tension → insight → reflection
-`,
+- Hook → tension → insight → reflection
+`.trim(),
   },
   {
     slug: "interview-prep",
@@ -97,14 +94,13 @@ export const guides: Guide[] = [
     tags: ["practice", "scripts", "confidence"],
     minutes: 12,
     updatedISO: "2025-12-23",
-    content: `# Interview prep
+    content: `
+## "Tell me about yourself" (30–60s)
+- Past → Present → Future
 
-## Tell me about yourself (30–60s)
-Past → Present → Future
-
-## Why this school?
-Program fit + personal fit + contribution
-`,
+## "Why this school?"
+- Program fit + personal fit + contribution
+`.trim(),
   },
   {
     slug: "visa-arrival-checklist",
@@ -115,21 +111,20 @@ Program fit + personal fit + contribution
     tags: ["F-1", "arrival", "documents"],
     minutes: 10,
     updatedISO: "2025-12-23",
-    content: `# Visa + arrival checklist
-
+    content: `
 ## Before travel
-- visa docs
-- housing confirmation
-- immunizations
+- Visa docs
+- Housing confirmation
+- Immunizations
 
 ## Week 1
 - SIM
-- bank
-- student ID
-`,
+- Bank
+- Student ID
+`.trim(),
   },
   {
-    slug: "budgeting-in-us",
+    slug: "budgeting-in-the-us",
     title: "Budgeting in the U.S. as an international student",
     description:
       "Realistic monthly budgets, rent strategies, and how to avoid money stress during school.",
@@ -137,22 +132,16 @@ Program fit + personal fit + contribution
     tags: ["budget", "rent", "planning"],
     minutes: 9,
     updatedISO: "2025-12-22",
-    content: `# Budgeting in the U.S.
-
-## Baseline
-- rent + utilities
-- food
-- transport
-- phone + subscriptions
+    content: `
+## Make a baseline budget
+- Rent + utilities
+- Food
+- Transport
+- Phone + subscriptions
 
 ## Reduce the big 2
 - Rent: roommates / location tradeoffs
 - Food: meal prep / campus plans
-`,
+`.trim(),
   },
 ];
-
-export function formatUpdated(iso: string) {
-  // keep it simple: show YYYY-MM-DD (already ISO-like)
-  return iso;
-}
